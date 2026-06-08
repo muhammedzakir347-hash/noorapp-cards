@@ -135,44 +135,55 @@ export default function CreatePage({ params }: { params: Promise<{ templateId: s
   const publish = async () => {
     setSubmitting(true);
     setError("");
-    try {
-      const supabase = createClient();
 
-      const weddingDate = form.weddingDate && form.weddingTime
-        ? new Date(`${form.weddingDate}T${form.weddingTime}`).toISOString()
-        : form.weddingDate ? new Date(form.weddingDate).toISOString() : null;
+    const supabase = createClient();
 
-      const data: InvitationData = {
-        groomName: form.groomName,
-        brideName: form.brideName,
-        venue: form.venue,
-        venueAddress: form.venueAddress || undefined,
-        venueMapUrl: form.venueMapUrl || undefined,
-        photos: form.photos.length ? form.photos : undefined,
-        showHijriDate: form.showHijriDate,
-        dressCode: form.dressCode || undefined,
-        transport: form.transport || undefined,
-        musicUrl: form.musicUrl || undefined,
-        events: form.events.filter((e) => e.name && e.date),
-        language: form.language,
-      };
+    const weddingDate = form.weddingDate
+      ? new Date(`${form.weddingDate}T${form.weddingTime || "00:00"}`).toISOString()
+      : null;
 
-      const { error: err } = await supabase.from("invitations").insert({
-        template_id: templateId,
-        style: template?.style ?? "modern",
-        slug: form.slug,
-        data,
-        wedding_date: weddingDate,
-        published: true,
-      });
+    const invitationData: InvitationData = {
+      groomName: form.groomName,
+      brideName: form.brideName,
+      venue: form.venue,
+      venueAddress: form.venueAddress || undefined,
+      venueMapUrl: form.venueMapUrl || undefined,
+      photos: form.photos.filter(Boolean).length ? form.photos.filter(Boolean) : undefined,
+      showHijriDate: form.showHijriDate,
+      dressCode: form.dressCode || undefined,
+      transport: form.transport || undefined,
+      musicUrl: form.musicUrl || undefined,
+      events: form.events.filter((e) => e.name && e.date),
+      language: form.language,
+    };
 
-      if (err) throw err;
-      router.push(`/i/${form.slug}`);
-    } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
-    } finally {
-      setSubmitting(false);
+    /* Get logged-in user if any (nullable — anon inserts are allowed by RLS) */
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { error: err } = await supabase.from("invitations").insert({
+      template_id: templateId,
+      style: template?.style ?? "modern",
+      slug: form.slug.trim(),
+      data: invitationData,
+      wedding_date: weddingDate,
+      published: true,
+      ...(user?.id ? { user_id: user.id } : {}),
+    });
+
+    setSubmitting(false);
+
+    if (err) {
+      console.error("[publish] Supabase error:", err);
+      /* err.code 23505 = unique_violation (slug already taken) */
+      if (err.code === "23505") {
+        setError("That URL slug is already taken — go back and choose a different one.");
+      } else {
+        setError(err.message ?? "Something went wrong. Please try again.");
+      }
+      return;
     }
+
+    router.push(`/i/${form.slug.trim()}`);
   };
 
   if (!template) {
