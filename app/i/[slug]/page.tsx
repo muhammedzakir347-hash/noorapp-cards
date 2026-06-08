@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import type { Invitation } from "@/lib/supabase";
 import IslamicTemplate from "@/components/templates/IslamicTemplate";
+import HinduTemplate from "@/components/templates/HinduTemplate";
+import ChristianTemplate from "@/components/templates/ChristianTemplate";
+import ModernTemplate from "@/components/templates/ModernTemplate";
 
 /* ── Supabase server fetch ─────────────────────────────────── */
 async function getInvitation(slug: string): Promise<Invitation | null> {
@@ -104,23 +107,30 @@ function renderTemplate(inv: Invitation) {
     );
   }
 
-  /* Placeholder for other styles — to be replaced with real templates */
-  return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "#0f1f17" }}>
-      <div className="text-center p-8 max-w-sm">
-        <p className="font-amiri text-4xl mb-4" style={{ color: "#C9A84C" }}>
-          {data.groomName} & {data.brideName}
-        </p>
-        <p className="font-lora text-lg" style={{ color: "#FAF6EF" }}>
-          {weddingDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
-        </p>
-        <p className="text-sm mt-2" style={{ color: "#b8b4aa" }}>{data.venue}</p>
-        <p className="text-xs mt-6 italic" style={{ color: "#b8b4aa60" }}>
-          {inv.style.charAt(0).toUpperCase() + inv.style.slice(1)} template — coming soon
-        </p>
-      </div>
-    </div>
-  );
+  const sharedProps = {
+    invitationId: inv.id,
+    groomName: data.groomName ?? "Ahmad",
+    brideName: data.brideName ?? "Mariam",
+    weddingDate,
+    venue: data.venue ?? "To be announced",
+    venueAddress: data.venueAddress,
+    venueMapUrl: data.venueMapUrl,
+    photos: data.photos,
+    events,
+    dressCode: data.dressCode,
+    transport: data.transport,
+    shareUrl,
+  };
+
+  if (inv.style === "hindu") {
+    return <HinduTemplate {...sharedProps} />;
+  }
+
+  if (inv.style === "christian") {
+    return <ChristianTemplate {...sharedProps} />;
+  }
+
+  return <ModernTemplate {...sharedProps} musicUrl={data.musicUrl} />;
 }
 
 /* ── Page ──────────────────────────────────────────────────── */
