@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState, use, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, ChevronLeft, Check, Plus, Trash2, Loader2, Upload } from "lucide-react";
+import { ChevronRight, ChevronLeft, Check, Plus, Trash2, Loader2, Upload, Music2, X } from "lucide-react";
 import { getTemplateById } from "@/lib/templates";
 import { createClient } from "@/lib/supabase";
 import type { InvitationData } from "@/lib/supabase";
@@ -79,6 +79,164 @@ function Field({
         onFocus={(e) => { e.currentTarget.style.borderColor = "#C9A84C"; }}
         onBlur={(e) => { e.currentTarget.style.borderColor = "#234d38"; }}
       />
+    </div>
+  );
+}
+
+/* ── Music file upload ─────────────────────────────────────── */
+function MusicUpload({
+  currentUrl,
+  onUpload,
+  onRemove,
+  accent,
+}: {
+  currentUrl: string;
+  onUpload: (url: string) => void;
+  onRemove: () => void;
+  accent: string;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress]   = useState(0);
+  const [uploadError, setUploadError] = useState("");
+  const [fileName, setFileName]   = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+
+  async function handleFile(file: File) {
+    setUploadError("");
+
+    if (file.size > MAX_BYTES) {
+      setUploadError("File must be under 10MB");
+      return;
+    }
+
+    setFileName(file.name);
+    setUploading(true);
+    setProgress(0);
+
+    /* Supabase SDK uses fetch internally — no native progress events.
+       Simulate with an interval that climbs to 88% then jumps to 100%. */
+    const ticker = setInterval(() => {
+      setProgress(p => (p < 88 ? p + 4 : p));
+    }, 200);
+
+    try {
+      const supabase = createClient();
+      const ext  = file.name.split(".").pop() ?? "mp3";
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+      const { data, error: uploadErr } = await supabase.storage
+        .from("invitation-music")
+        .upload(path, file, { contentType: file.type, upsert: false });
+
+      clearInterval(ticker);
+
+      if (uploadErr) {
+        setUploadError(uploadErr.message);
+        setUploading(false);
+        setProgress(0);
+        return;
+      }
+
+      setProgress(100);
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("invitation-music")
+        .getPublicUrl(data.path);
+
+      onUpload(publicUrl);
+      setTimeout(() => { setUploading(false); setProgress(0); }, 600);
+    } catch {
+      clearInterval(ticker);
+      setUploadError("Upload failed. Please try again.");
+      setUploading(false);
+      setProgress(0);
+    }
+  }
+
+  /* ── Uploaded state ─────────────────────────────────────── */
+  if (currentUrl && !uploading) {
+    return (
+      <div
+        className="flex items-center gap-3 rounded-xl border px-3 py-3"
+        style={{ background: "#0f1f17", borderColor: "#234d38" }}
+      >
+        <Music2 size={18} className="shrink-0" style={{ color: accent }} />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium truncate" style={{ color: "#FAF6EF" }}>
+            {fileName || "Music uploaded"}
+          </p>
+          <p className="text-xs" style={{ color: "#b8b4aa" }}>Ready to play on invitation</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => { setFileName(""); onRemove(); }}
+          className="shrink-0 p-1 rounded-lg transition-colors hover:opacity-70"
+          style={{ color: "#b8b4aa" }}
+          title="Remove music"
+        >
+          <X size={15} />
+        </button>
+      </div>
+    );
+  }
+
+  /* ── Upload in progress ─────────────────────────────────── */
+  if (uploading) {
+    return (
+      <div
+        className="rounded-xl border p-4 space-y-2"
+        style={{ background: "#0f1f17", borderColor: "#234d38" }}
+      >
+        <div className="flex items-center gap-2">
+          <Loader2 size={14} className="animate-spin shrink-0" style={{ color: accent }} />
+          <p className="text-sm truncate" style={{ color: "#FAF6EF" }}>
+            Uploading {fileName}…
+          </p>
+        </div>
+        <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: "#234d38" }}>
+          <div
+            className="h-full rounded-full transition-all duration-300"
+            style={{ width: `${progress}%`, background: accent }}
+          />
+        </div>
+        <p className="text-xs" style={{ color: "#b8b4aa" }}>{progress}%</p>
+      </div>
+    );
+  }
+
+  /* ── Default: upload button ─────────────────────────────── */
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className="w-full flex items-center gap-3 rounded-xl border px-4 py-3 text-left transition-opacity hover:opacity-80"
+        style={{ borderColor: `${accent}50`, borderStyle: "dashed", color: accent }}
+      >
+        <Music2 size={16} className="shrink-0" />
+        <div>
+          <p className="text-sm font-medium">Upload background music</p>
+          <p className="text-xs mt-0.5" style={{ color: "#b8b4aa" }}>
+            MP3, WAV, OGG, M4A · Max 10MB
+          </p>
+        </div>
+      </button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept=".mp3,.wav,.ogg,.m4a,audio/mpeg,audio/wav,audio/ogg,audio/mp4"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleFile(file);
+          e.target.value = ""; // allow re-selecting the same file
+        }}
+      />
+      {uploadError && (
+        <p className="mt-1.5 text-xs" style={{ color: "#fca5a5" }}>{uploadError}</p>
+      )}
     </div>
   );
 }
@@ -334,7 +492,17 @@ export default function CreatePage({ params }: { params: Promise<{ templateId: s
 
                 <Field label="Dress Code (optional)" value={form.dressCode} onChange={(v) => set("dressCode", v)} placeholder="Formal / Traditional" />
                 <Field label="Transport Info (optional)" value={form.transport} onChange={(v) => set("transport", v)} placeholder="Free bus from Grand Mosque" />
-                <Field label="Background Music URL (optional)" value={form.musicUrl} onChange={(v) => set("musicUrl", v)} placeholder="https://example.com/nasheed.mp3" />
+                <div>
+                  <p className="text-xs font-medium mb-1.5" style={{ color: "#b8b4aa" }}>
+                    Background Music (optional)
+                  </p>
+                  <MusicUpload
+                    currentUrl={form.musicUrl}
+                    onUpload={(url) => set("musicUrl", url)}
+                    onRemove={() => set("musicUrl", "")}
+                    accent={accent}
+                  />
+                </div>
 
                 {/* Events */}
                 <div>
