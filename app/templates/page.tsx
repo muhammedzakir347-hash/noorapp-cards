@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { TEMPLATES, STYLE_META, type TemplateStyle } from "@/lib/templates";
-import { getAdminUser } from "@/lib/admin";
-
-export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Browse Templates — نور Cards",
@@ -17,9 +14,7 @@ const STYLE_COLORS: Record<TemplateStyle, string> = {
   modern:    "#C9A84C",
 };
 
-export default async function TemplatesPage() {
-  const adminUser = await getAdminUser();
-  const isAdmin = !!adminUser;
+export default function TemplatesPage() {
   const styles = Object.keys(STYLE_META) as TemplateStyle[];
 
   return (
@@ -99,21 +94,12 @@ export default async function TemplatesPage() {
                     {/* CTA */}
                     <div className="px-6 pb-6 space-y-2">
                       <Link
-                        href={
-                          isAdmin
-                            ? `/create/${template.id}`
-                            : `/checkout?plan=pro&template=${template.id}`
-                        }
+                        href={`/create/${template.id}`}
                         className="block text-center rounded-xl py-2.5 text-sm font-semibold transition-colors"
                         style={{ background: template.colors.accent, color: "#0f1f17" }}
                       >
-                        {isAdmin ? "Create Now →" : "Use This Template"}
+                        Use This Template
                       </Link>
-                      {isAdmin && (
-                        <p className="text-center text-xs" style={{ color: "#C9A84C80" }}>
-                          ✓ Admin — payment bypassed
-                        </p>
-                      )}
                     </div>
                   </div>
                 ))}
