@@ -19,8 +19,8 @@ export const TEMPLATES: Template[] = [
     style: "islamic",
     emoji: "🕌",
     colors: { bg: "#0a5c3a", card: "#0d7048", accent: "#C9A84C", text: "#FAF6EF" },
-    features: ["bismillah", "mughal-arch", "cursive-names", "hijri-date", "countdown", "slideshow", "couple-silhouette", "rsvp", "music"],
-    description: "Mughal arch frame, arabesque patterns, cursive names, and couple silhouette",
+    features: ["bismillah", "mughal-arch", "cursive-names", "couple-photo", "corner-mandalas"],
+    description: "Luxurious emerald & gold Mughal arch design with arabesque corner mandalas",
   },
   {
     id: "islamic-classic",

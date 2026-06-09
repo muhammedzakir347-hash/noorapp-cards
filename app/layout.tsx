@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Amiri, Lora, Inter, Pinyon_Script } from "next/font/google";
+import { Amiri, Lora, Inter, Pinyon_Script, Great_Vibes } from "next/font/google";
 import "./globals.css";
 
 const amiri = Amiri({
@@ -28,6 +28,13 @@ const pinyonScript = Pinyon_Script({
   display: "swap",
 });
 
+const greatVibes = Great_Vibes({
+  variable: "--font-great-vibes-var",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "NoorCards — Beautiful Digital Wedding Invitations",
   description: "Create stunning digital wedding invitations. Islamic, Hindu, Christian & Modern styles. RSVP management, countdown timers, and more.",
@@ -44,7 +51,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${amiri.variable} ${lora.variable} ${inter.variable} ${pinyonScript.variable}`}>
+    <html lang="en" className={`${amiri.variable} ${lora.variable} ${inter.variable} ${pinyonScript.variable} ${greatVibes.variable}`}>
       <body className="min-h-screen bg-bg text-ivory font-inter antialiased">
         {children}
       </body>
