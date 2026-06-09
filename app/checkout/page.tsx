@@ -11,6 +11,7 @@ const PLANS = {
 function CheckoutContent() {
   const searchParams = useSearchParams();
   const planId = (searchParams.get("plan") ?? "pro") as keyof typeof PLANS;
+  const templateId = searchParams.get("template") ?? "";
   const plan = PLANS[planId] ?? PLANS.pro;
 
   const [currency, setCurrency] = useState<"INR" | "USD">("INR");
@@ -22,7 +23,11 @@ function CheckoutContent() {
   const handlePay = () => {
     setLoading(true);
     // TODO: integrate Razorpay (INR) or Stripe (USD)
-    setTimeout(() => setLoading(false), 2000);
+    // On success: redirect to /create/[templateId]
+    setTimeout(() => {
+      setLoading(false);
+      if (templateId) window.location.href = `/create/${templateId}`;
+    }, 2000);
   };
 
   return (

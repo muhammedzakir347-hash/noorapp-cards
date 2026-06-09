@@ -99,15 +99,19 @@ export default async function TemplatesPage() {
                     {/* CTA */}
                     <div className="px-6 pb-6 space-y-2">
                       <Link
-                        href={`/create/${template.id}`}
+                        href={
+                          isAdmin
+                            ? `/create/${template.id}`
+                            : `/checkout?plan=pro&template=${template.id}`
+                        }
                         className="block text-center rounded-xl py-2.5 text-sm font-semibold transition-colors"
                         style={{ background: template.colors.accent, color: "#0f1f17" }}
                       >
-                        Use This Template
+                        {isAdmin ? "Create Now →" : "Use This Template"}
                       </Link>
                       {isAdmin && (
                         <p className="text-center text-xs" style={{ color: "#C9A84C80" }}>
-                          ✓ Admin — free access
+                          ✓ Admin — payment bypassed
                         </p>
                       )}
                     </div>
