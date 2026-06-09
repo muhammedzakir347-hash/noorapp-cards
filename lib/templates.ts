@@ -13,6 +13,16 @@ export interface Template {
 
 export const TEMPLATES: Template[] = [
   {
+    id: "islamic-premium",
+    name: "Al-Noor Premium",
+    nameAr: "النور الفاخر",
+    style: "islamic",
+    emoji: "🕌",
+    colors: { bg: "#0a5c3a", card: "#0d7048", accent: "#C9A84C", text: "#FAF6EF" },
+    features: ["bismillah", "mughal-arch", "cursive-names", "hijri-date", "countdown", "slideshow", "couple-silhouette", "rsvp", "music"],
+    description: "Mughal arch frame, arabesque patterns, cursive names, and couple silhouette",
+  },
+  {
     id: "islamic-classic",
     name: "Al-Noor Classic",
     nameAr: "النور الكلاسيكي",

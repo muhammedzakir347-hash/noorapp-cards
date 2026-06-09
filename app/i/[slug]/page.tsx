@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 import type { Invitation } from "@/lib/supabase";
 import IslamicTemplate from "@/components/templates/IslamicTemplate";
+import IslamicPremiumTemplate from "@/components/templates/IslamicPremiumTemplate";
 import HinduTemplate from "@/components/templates/HinduTemplate";
 import ChristianTemplate from "@/components/templates/ChristianTemplate";
 import ModernTemplate from "@/components/templates/ModernTemplate";
@@ -86,25 +87,37 @@ function renderTemplate(inv: Invitation) {
 
   const shareUrl = `https://cards.noorapp.app/i/${inv.slug}`;
 
+  const islamicProps = {
+    invitationId: inv.id,
+    groomName: data.groomName ?? "Ahmad",
+    brideName: data.brideName ?? "Mariam",
+    weddingDate,
+    venue: data.venue ?? "To be announced",
+    venueAddress: data.venueAddress,
+    venueMapUrl: data.venueMapUrl,
+    photos: data.photos,
+    showHijriDate: data.showHijriDate !== false,
+    events,
+    musicUrl: data.musicUrl,
+    dressCode: data.dressCode,
+    transport: data.transport,
+    shareUrl,
+  };
+
   if (inv.style === "islamic") {
-    return (
-      <IslamicTemplate
-        invitationId={inv.id}
-        groomName={data.groomName ?? "Ahmad"}
-        brideName={data.brideName ?? "Mariam"}
-        weddingDate={weddingDate}
-        venue={data.venue ?? "To be announced"}
-        venueAddress={data.venueAddress}
-        venueMapUrl={data.venueMapUrl}
-        photos={data.photos}
-        showHijriDate={data.showHijriDate !== false}
-        events={events}
-        musicUrl={data.musicUrl}
-        dressCode={data.dressCode}
-        transport={data.transport}
-        shareUrl={shareUrl}
-      />
-    );
+    if (inv.template_id === "islamic-premium") {
+      return (
+        <IslamicPremiumTemplate
+          {...islamicProps}
+          quranVerse={
+            data.quranVerse && typeof data.quranVerse === "object"
+              ? (data.quranVerse as { arabic: string; english: string; reference: string })
+              : undefined
+          }
+        />
+      );
+    }
+    return <IslamicTemplate {...islamicProps} />;
   }
 
   const sharedProps = {

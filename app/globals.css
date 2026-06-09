@@ -11,9 +11,10 @@
   --color-muted:      #b8b4aa;
 
   /* Fonts — loaded via next/font, injected as CSS vars */
-  --font-amiri: var(--font-amiri-var, "Amiri"), serif;
-  --font-lora:  var(--font-lora-var,  "Lora"),  serif;
-  --font-inter: var(--font-inter-var, "Inter"), sans-serif;
+  --font-amiri:  var(--font-amiri-var,  "Amiri"),         serif;
+  --font-lora:   var(--font-lora-var,   "Lora"),          serif;
+  --font-inter:  var(--font-inter-var,  "Inter"),         sans-serif;
+  --font-pinyon: var(--font-pinyon-var, "Pinyon Script"), cursive;
 }
 
 body {
