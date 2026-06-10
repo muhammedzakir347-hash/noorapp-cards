@@ -109,11 +109,7 @@ function renderTemplate(inv: Invitation) {
       return (
         <IslamicPremiumTemplate
           {...islamicProps}
-          quranVerse={
-            data.quranVerse && typeof data.quranVerse === "object"
-              ? (data.quranVerse as { arabic: string; english: string; reference: string })
-              : undefined
-          }
+          endTime={data.endTime}
         />
       );
     }

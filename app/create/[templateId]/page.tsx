@@ -18,6 +18,7 @@ interface FormData {
   /* Step 2 */
   weddingDate: string;
   weddingTime: string;
+  endTime: string;
   venue: string;
   venueAddress: string;
   venueMapUrl: string;
@@ -255,7 +256,7 @@ export default function CreatePage({ params }: { params: Promise<{ templateId: s
 
   const [form, setForm] = useState<FormData>({
     groomName: "", brideName: "", groomFamily: "", brideFamily: "",
-    weddingDate: "", weddingTime: "19:00", venue: "", venueAddress: "", venueMapUrl: "",
+    weddingDate: "", weddingTime: "19:00", endTime: "", venue: "", venueAddress: "", venueMapUrl: "",
     photos: [],
     showHijriDate: true, dressCode: "", transport: "", musicUrl: "", events: [],
     language: "en",
@@ -310,6 +311,11 @@ export default function CreatePage({ params }: { params: Promise<{ templateId: s
       showHijriDate: form.showHijriDate,
       dressCode: form.dressCode || undefined,
       transport: form.transport || undefined,
+      endTime: form.endTime
+        ? new Date(`${form.weddingDate || "2000-01-01"}T${form.endTime}`).toLocaleTimeString("en-US", {
+            hour: "numeric", minute: "2-digit", hour12: true,
+          })
+        : undefined,
       musicUrl: form.musicUrl || undefined,
       events: form.events.filter((e) => e.name && e.date),
       language: form.language,
@@ -411,8 +417,9 @@ export default function CreatePage({ params }: { params: Promise<{ templateId: s
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <Field label="Wedding Date" value={form.weddingDate} onChange={(v) => set("weddingDate", v)} type="date" required />
-                  <Field label="Time"         value={form.weddingTime} onChange={(v) => set("weddingTime", v)} type="time" />
+                  <Field label="Start Time"   value={form.weddingTime} onChange={(v) => set("weddingTime", v)} type="time" />
                 </div>
+                <Field label="End Time (optional)" value={form.endTime} onChange={(v) => set("endTime", v)} type="time" />
                 <Field label="Venue Name"    value={form.venue}        onChange={(v) => set("venue", v)}        placeholder="Al-Baraka Banquet Hall" required />
                 <Field label="Venue Address" value={form.venueAddress} onChange={(v) => set("venueAddress", v)} placeholder="123 Main St, Dubai, UAE" />
                 <Field label="Google Maps URL (optional)" value={form.venueMapUrl} onChange={(v) => set("venueMapUrl", v)} placeholder="https://maps.google.com/..." />

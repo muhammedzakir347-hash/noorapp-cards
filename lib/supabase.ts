@@ -36,6 +36,7 @@ export interface InvitationData {
   photos?: string[];
   quranVerse?: string;
   showHijriDate?: boolean;
+  endTime?: string;
   events?: { name: string; date: string; venue: string }[];
   musicUrl?: string;
   dressCode?: string;
