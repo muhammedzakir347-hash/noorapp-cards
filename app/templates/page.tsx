@@ -7,13 +7,6 @@ export const metadata: Metadata = {
   description: "Choose from Islamic, Hindu, Christian, and Modern wedding invitation templates.",
 };
 
-const STYLE_COLORS: Record<TemplateStyle, string> = {
-  islamic:   "#C9A84C",
-  hindu:     "#FF8C00",
-  christian: "#D4AF37",
-  modern:    "#C9A84C",
-};
-
 export default function TemplatesPage() {
   const styles = Object.keys(STYLE_META) as TemplateStyle[];
 
@@ -31,7 +24,6 @@ export default function TemplatesPage() {
 
         {styles.map((style) => {
           const meta = STYLE_META[style];
-          const accent = STYLE_COLORS[style];
           const templates = TEMPLATES.filter((t) => t.style === style);
 
           return (
@@ -47,7 +39,11 @@ export default function TemplatesPage() {
               </div>
 
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {templates.map((template) => (
+                {templates.map((template) => {
+                  const templateHref = template.id === "mountain" ? "/templates/mountain" : `/create/${template.id}`;
+                  const ctaLabel = template.id === "mountain" ? "Open Template" : "Use This Template";
+
+                  return (
                   <div
                     key={template.id}
                     className="rounded-2xl overflow-hidden group transition-transform hover:-translate-y-1"
@@ -94,15 +90,16 @@ export default function TemplatesPage() {
                     {/* CTA */}
                     <div className="px-6 pb-6 space-y-2">
                       <Link
-                        href={`/create/${template.id}`}
+                        href={templateHref}
                         className="block text-center rounded-xl py-2.5 text-sm font-semibold transition-colors"
                         style={{ background: template.colors.accent, color: "#0f1f17" }}
                       >
-                        Use This Template
+                        {ctaLabel}
                       </Link>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           );

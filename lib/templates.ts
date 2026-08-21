@@ -61,6 +61,15 @@ export const TEMPLATES: Template[] = [
     description: "Royal maroon & gold Hindu wedding invitation with rich ornamentation",
   },
   {
+    id: "mountain",
+    name: "Mountain",
+    style: "hindu",
+    emoji: "M",
+    colors: { bg: "#063946", card: "#0a4c5a", accent: "#D8B75B", text: "#FFF3C9" },
+    features: ["storybook-scroll", "parallax", "event-cards", "countdown", "rsvp", "music"],
+    description: "Scroll-driven Indian wedding invitation with mountain artwork, teal textures, gold ornaments, and animated story sections",
+  },
+  {
     id: "christian-classic",
     name: "Holy Union Classic",
     style: "christian",
@@ -108,7 +117,7 @@ export function getTemplatesByStyle(style: TemplateStyle): Template[] {
 
 export const STYLE_META: Record<TemplateStyle, { label: string; icon: string; description: string; count: number }> = {
   islamic:   { label: "Islamic",   icon: "🕌", description: "Arabic calligraphy & Quranic verses", count: 2 },
-  hindu:     { label: "Hindu",     icon: "🪷", description: "Auspicious motifs & vibrant colors",   count: 2 },
+  hindu:     { label: "Hindu",     icon: "🪷", description: "Auspicious motifs & vibrant colors",   count: 3 },
   christian: { label: "Christian", icon: "✝️", description: "Scripture & timeless elegance",        count: 2 },
   modern:    { label: "Modern",    icon: "✨", description: "Minimalist & contemporary designs",    count: 2 },
 };

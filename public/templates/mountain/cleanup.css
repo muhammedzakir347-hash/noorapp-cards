@@ -1,0 +1,19 @@
+[data-framer-name="Watermark"],
+[data-framer-name="Missing Piece Logo"],
+[data-framer-name="Copyright"],
+[data-framer-name="Buy button stack"],
+a[href*="rzp.io/rzp/mountain"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+img[src*="3vpFOuN5tHb2JuYqzoPGPaRcA"],
+img[srcset*="3vpFOuN5tHb2JuYqzoPGPaRcA"] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+img {
+  transform-origin: 50% 50%;
+}
